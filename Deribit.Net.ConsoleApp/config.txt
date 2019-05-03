@@ -1,0 +1,54 @@
+﻿# default settings for sessions
+[DEFAULT]
+FileStorePath=store
+FileLogPath=log
+ReconnectInterval=60
+SenderCompID=DERIBITSERVER
+HeartBtInt=30
+SocketAcceptPort=9881
+SocketConnectPort=9881
+SocketConnectHost=test.deribit.com
+DataDictionary=FIX44.xml
+Username=QTaUk5S9uMrt
+StartTime=00:00:00
+EndTime=23:59:59
+# session definition
+#[SESSION]
+# inherit FileStorePath, FileLogPath, ConnectionType, 
+#    ReconnectInterval and SenderCompID from default
+#BeginString=FIX.4.4
+#TargetCompID=ARCA
+#StartTime=12:30:00
+#EndTime=23:30:00
+#HeartBtInt=20
+#SocketConnectPort=9823
+#SocketConnectHost=123.123.123.123
+#DataDictionary=somewhere/FIX41.xml
+
+[SESSION]
+BeginString=FIX.4.4
+TargetCompID=testitinitiator
+ConnectionType=initiator
+
+[SESSION]
+BeginString=FIX.4.4
+TargetCompID=testitaccesptor
+ConnectionType=acceptor
+
+#[SESSION]
+#BeginString=FIX.4.2
+#TargetCompID=INCA
+#StartTime=12:30:00
+#EndTime=21:30:00
+# overide default setting for RecconnectInterval
+#ReconnectInterval=30
+#HeartBtInt=30
+#SocketConnectPort=6523
+#SocketConnectHost=3.3.3.3
+# (optional) alternate connection ports 
+#  and hosts to cycle through on failover
+#SocketConnectPort1=8392
+#SocketConnectHost1=8.8.8.8
+#SocketConnectPort2=2932
+#SocketConnectHost2=12.12.12.12
+#DataDictionary=somewhere/FIX42.xml
