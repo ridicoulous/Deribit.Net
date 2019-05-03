@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using QuickFix;
+﻿using QuickFix;
 using QuickFix.Fields;
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 
 
 namespace Deribit.Net.ConsoleApp
@@ -29,24 +29,59 @@ namespace Deribit.Net.ConsoleApp
 
         public void FromAdmin(Message message, SessionID sessionID)
         {
-            var logon = message as QuickFix.FIX44.Logon;
-
-            if (logon != null)
+            if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
             {
-                //string userName = logon.GetUs().getValue();
-                //string expectedPassword = PasswordsByUser[userName];
-
-                //string suppliedPassword = logon.getPassword().getValue();
-
-                //if (expectedPassword != suppliedPassword)
-                //    throw new RejectLogon();
+                //message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
+                //var rawdata = $"{DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                //message.SetField(new QuickFix.Fields.RawData(rawdata));
+                //var pass = GetBase64(GetSha256Hash(rawdata + "QSC5OEP7JOUCLZSVOLOVJRFV67UZCG4D"));
+                //message.SetField(new QuickFix.Fields.Password(pass));
             }
         }
+        /*
+         The RawData(96) tag contains a timestamp and a nonce, separated by an ASCII period (.).
+         The timestamp needs to be a strictly increasing integer. We recommend using a timestamp in milliseconds. 
+         The nonce is composed base64-encoded randomly chosen bytes. For safety reasons, it is important that the nonce is sufficiently long and sourced from a cryptographically secure random number generator.
+         We recommend at least 32 bytes, but the nonce can be up to 512 bytes.
+         The Password(553) tag should contain a base64 encoded SHA256 hash of the concatenation of the RawData(96) 
+         content and the access secret: base64(sha256(RawData ++ access_secret)).*/
         public void ToAdmin(Message message, SessionID sessionID)
         {
             //var t = message.
+            if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
+            {
+                message.SetField(new QuickFix.Fields.Username("KEY"));
+                var rawdata = $"{DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                message.SetField(new QuickFix.Fields.RawData(rawdata));
+                var pass = GetBase64(GetSha256Hash(rawdata + "SECRET"));
+                message.SetField(new QuickFix.Fields.Password(pass));
+            }
         }
 
+        private byte[] GetSha256Hash(string input)
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(input);
+            SHA256Managed sha256 = new SHA256Managed();
+            byte[] hash = sha256.ComputeHash(bytes);
+            return hash;
+        }
+
+        private string GetBase64(byte[] input)
+        {
+           // var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+           return System.Convert.ToBase64String(input);
+        }
+        private byte[] GetRandomBytes()
+        {
+            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+            {
+                // Buffer storage.
+                byte[] data = new byte[256];
+                rng.GetBytes(data);
+                return data;
+            }
+
+        }
         public void FromApp(Message message, SessionID sessionID)
         {
             Console.WriteLine("IN:  " + message.ToString());
