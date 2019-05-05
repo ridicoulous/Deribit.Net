@@ -1,69 +1,75 @@
 ﻿using QuickFix;
 using QuickFix.Transport;
+using System;
 
 namespace Deribit.Net.ConsoleApp
 {
-   
+    /*
+     # default settings for sessions
+ [DEFAULT]
+ =store
+ =log
+ =30
+ =
+ =30
+ =
+ =
+ =
+ =
+ =
+
+ [SESSION]
+ =FIX.4.4
+ =deribitique424242
+ =initiator*/
     class Program
     {
-        public class Myinit : SocketInitiator
+        static Dictionary defaults = new Dictionary("DEFAULT", new System.Collections.Generic.Dictionary<string, string>()
         {
-            public Myinit(IApplication application, IMessageStoreFactory storeFactory, SessionSettings settings, ILogFactory logFactory, IMessageFactory messageFactory) : base(application, storeFactory, settings, logFactory, messageFactory)
-            {
-            }
+            {"FileStorePath","store" },
+            {"FileLogPath","log" },
+            {"ReconnectInterval","30" },
+            {"TargetCompID","DERIBITSERVER" },
+            {"HeartBtInt","30" },
+            {"SocketConnectPort","9881" },
+            {"SocketConnectHost","test.deribit.com" },
+            {"DataDictionary","FIX44.xml" },
+            {"StartTime","00:00:00" },
+            {"EndTime","23:59:59" }    ,
+                      {"ConnectionType","initiator" }
 
-            protected override void DoConnect(SessionID sessionID, Dictionary settings)
-            {
-                base.DoConnect(sessionID, settings);
-            }
-
-            protected override void OnConfigure(SessionSettings settings)
-            {
-                
-                base.OnConfigure(settings);
-            }
-
-          
-
-            protected override bool OnPoll(double timeout)
-            {
-                return base.OnPoll(timeout);
-            }
-
-            protected override void OnRemove(SessionID sessionID)
-            {
-                base.OnRemove(sessionID);
-            }
-
-            protected override void OnStart()
-            {
-                base.OnStart();
-            }
-
-            protected override void OnStop()
-            {
-                base.OnStop();
-            }
-        }
+        }) ;
+        static Dictionary session = new Dictionary("SESSION", new System.Collections.Generic.Dictionary<string, string>()
+        {
+            {"BeginString","FIX.4.4" },
+          //  {"SenderCompID",Guid.NewGuid().ToString() },
+  
+        });
         static void Main(string[] args)
         {
-            SessionSettings settings = new SessionSettings("config.txt");
-
-            TradeClientApp application = new TradeClientApp();
+            //SessionSettings settings = new SessionSettings("config.txt");
+            SessionSettings settings = new SessionSettings();
+            settings.Set(defaults);
+            settings.Set(new SessionID("FIX.4.4",Guid.NewGuid().ToString(),"DERIBITSERVER"), new Dictionary("SESSION", new System.Collections.Generic.Dictionary<string, string>()
+        {
+            {"BeginString","FIX.4.4" },
+          //  {"SenderCompID",Guid.NewGuid().ToString() },
+          //  {"ConnectionType","initiator" }
+        }));
+           // settings.Set(session);
+           
+            DerbitFixClient application = new DerbitFixClient();
             
             IMessageStoreFactory storeFactory = new FileStoreFactory(settings);
             ILogFactory logFactory = new FileLogFactory(settings);
-            //ThreadedSocketAcceptor acceptor = new ThreadedSocketAcceptor(
-            //    application,
-            //    storeFactory,
-            //    settings,
-            //    logFactory);
+     
             QuickFix.Transport.SocketInitiator initiator = new QuickFix.Transport.SocketInitiator(application, storeFactory, settings, logFactory);
 
             // this is a developer-test kludge.  do not emulate.
             application.MyInitiator = initiator;
             
             initiator.Start();
+            //application.QuerySecurityListRequest();
             application.Run();
             initiator.Stop();
 

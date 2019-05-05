@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 
 namespace Deribit.Net.ConsoleApp
 {
-    public class TradeClientApp : MessageCracker, IApplication
+    public class DerbitFixClient : MessageCracker, IApplication
     {
         Session _session = null;
 
@@ -25,17 +25,20 @@ namespace Deribit.Net.ConsoleApp
         {
             Console.WriteLine("Logon - " + sessionID.ToString());
         }
-        public void OnLogout(SessionID sessionID) { Console.WriteLine("Logout - " + sessionID.ToString()); }
+        public void OnLogout(SessionID sessionID)
+        {
+            Console.WriteLine("Logout - " + sessionID.ToString());
+        }
 
         public void FromAdmin(Message message, SessionID sessionID)
         {
             if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
             {
-                //message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
-                //var rawdata = $"{DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
-                //message.SetField(new QuickFix.Fields.RawData(rawdata));
-                //var pass = GetBase64(GetSha256Hash(rawdata + "QSC5OEP7JOUCLZSVOLOVJRFV67UZCG4D"));
-                //message.SetField(new QuickFix.Fields.Password(pass));
+                message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
+                var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                message.SetField(new QuickFix.Fields.RawData(rawdata));
+                var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
+                message.SetField(new QuickFix.Fields.Password(pass));
             }
         }
         /*
@@ -50,10 +53,10 @@ namespace Deribit.Net.ConsoleApp
             //var t = message.
             if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
             {
-                message.SetField(new QuickFix.Fields.Username("KEY"));
-                var rawdata = $"{DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
+                var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
                 message.SetField(new QuickFix.Fields.RawData(rawdata));
-                var pass = GetBase64(GetSha256Hash(rawdata + "SECRET"));
+                var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
                 message.SetField(new QuickFix.Fields.Password(pass));
             }
         }
@@ -124,16 +127,28 @@ namespace Deribit.Net.ConsoleApp
         {
             Console.WriteLine("Received execution report");
         }
-
+        public void OnMessage(QuickFix.FIX44.SecurityListRequest m, SessionID s)
+        {            
+            Console.WriteLine("Received securities list report");
+        }
         public void OnMessage(QuickFix.FIX44.OrderCancelReject m, SessionID s)
         {
             Console.WriteLine("Received order cancel reject");
         }
         #endregion
 
+        public void QuerySecurityListRequest()
+        {
+            Console.WriteLine("\nSecurityListRequest");
 
+            QuickFix.FIX44.SecurityListRequest m = new QuickFix.FIX44.SecurityListRequest() { SecurityReqID = new SecurityReqID("1"), SecurityListRequestType = new SecurityListRequestType(4) };
+
+            if (m != null)
+                SendMessage(m);
+        }
         public void Run()
         {
+            //QuerySecurityListRequest();
             while (true)
             {
                 try
@@ -182,7 +197,11 @@ namespace Deribit.Net.ConsoleApp
         private void SendMessage(Message m)
         {
             if (_session != null)
+            {
+                Console.WriteLine($"Sending message # "+ m.GetField(Tags.MsgSeqNum));
                 _session.Send(m);
+
+            }
             else
             {
                 // This probably won't ever happen.
@@ -213,6 +232,7 @@ namespace Deribit.Net.ConsoleApp
 
         private void QueryEnterOrder()
         {
+            QuerySecurityListRequest();
             Console.WriteLine("\nNewOrderSingle");
 
             QuickFix.FIX44.NewOrderSingle m = QueryNewOrderSingle44();
@@ -254,7 +274,7 @@ namespace Deribit.Net.ConsoleApp
             if (m != null && QueryConfirm("Send market data request"))
                 SendMessage(m);
         }
-
+     
         private bool QueryConfirm(string query)
         {
             Console.WriteLine();
@@ -320,7 +340,7 @@ namespace Deribit.Net.ConsoleApp
 
         private QuickFix.FIX44.MarketDataRequest QueryMarketDataRequest44()
         {
-            MDReqID mdReqID = new MDReqID("MARKETDATAID");
+            MDReqID mdReqID = new MDReqID("BTC-PERPETUAL");
             SubscriptionRequestType subType = new SubscriptionRequestType(SubscriptionRequestType.SNAPSHOT);
             MarketDepth marketDepth = new MarketDepth(0);
 
@@ -328,7 +348,7 @@ namespace Deribit.Net.ConsoleApp
             marketDataEntryGroup.Set(new MDEntryType(MDEntryType.BID));
 
             QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup symbolGroup = new QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup();
-            symbolGroup.Set(new Symbol("LNUX"));
+            symbolGroup.Set(new Symbol("BTC-PERPETUAL"));
 
             QuickFix.FIX44.MarketDataRequest message = new QuickFix.FIX44.MarketDataRequest(mdReqID, subType, marketDepth);
             message.AddGroup(marketDataEntryGroup);

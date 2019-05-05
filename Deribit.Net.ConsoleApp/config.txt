@@ -2,19 +2,16 @@
 [DEFAULT]
 FileStorePath=store
 FileLogPath=log
-ReconnectInterval=60
+ReconnectInterval=30
 TargetCompID=DERIBITSERVER
 HeartBtInt=30
-SocketAcceptPort=9881
 SocketConnectPort=9881
 SocketConnectHost=test.deribit.com
 DataDictionary=FIX44.xml
-#Username=QTaUk5S9uMrt
 StartTime=00:00:00
 EndTime=23:59:59
 
 [SESSION]
 BeginString=FIX.4.4
-SenderCompID=ridicoulous
+#SenderCompID=deribitique424242
 ConnectionType=initiator
-MsgSeqNum=1
