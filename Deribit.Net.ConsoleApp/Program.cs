@@ -23,41 +23,10 @@ namespace Deribit.Net.ConsoleApp
  =deribitique424242
  =initiator*/
     class Program
-    {
-        static Dictionary defaults = new Dictionary("DEFAULT", new System.Collections.Generic.Dictionary<string, string>()
-        {
-            {"FileStorePath","store" },
-            {"FileLogPath","log" },
-            {"ReconnectInterval","30" },
-            {"TargetCompID","DERIBITSERVER" },
-            {"HeartBtInt","30" },
-            {"SocketConnectPort","9881" },
-            {"SocketConnectHost","test.deribit.com" },
-            {"DataDictionary","FIX44.xml" },
-            {"StartTime","00:00:00" },
-            {"EndTime","23:59:59" }    ,
-                      {"ConnectionType","initiator" }
-
-        }) ;
-        static Dictionary session = new Dictionary("SESSION", new System.Collections.Generic.Dictionary<string, string>()
-        {
-            {"BeginString","FIX.4.4" },
-          //  {"SenderCompID",Guid.NewGuid().ToString() },
-  
-        });
+    {       
         static void Main(string[] args)
         {
-            //SessionSettings settings = new SessionSettings("config.txt");
-            SessionSettings settings = new SessionSettings();
-            settings.Set(defaults);
-            settings.Set(new SessionID("FIX.4.4",Guid.NewGuid().ToString(),"DERIBITSERVER"), new Dictionary("SESSION", new System.Collections.Generic.Dictionary<string, string>()
-        {
-            {"BeginString","FIX.4.4" },
-          //  {"SenderCompID",Guid.NewGuid().ToString() },
-          //  {"ConnectionType","initiator" }
-        }));
-           // settings.Set(session);
-           
+            SessionSettings settings = new SessionSettings("config.txt");
             DerbitFixClient application = new DerbitFixClient();
             
             IMessageStoreFactory storeFactory = new FileStoreFactory(settings);

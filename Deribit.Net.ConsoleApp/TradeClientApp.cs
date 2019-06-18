@@ -34,11 +34,12 @@ namespace Deribit.Net.ConsoleApp
         {
             if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
             {
-                message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
-                var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
-                message.SetField(new QuickFix.Fields.RawData(rawdata));
-                var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
-                message.SetField(new QuickFix.Fields.Password(pass));
+                //message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
+                //var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                //message.SetField(new QuickFix.Fields.RawData(rawdata));
+                //var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
+                message.SetField(new QuickFix.Fields.Password("Sandbox1234"));
+                message.SetField(new QuickFix.Fields.ResetSeqNumFlag(true));
             }
         }
         /*
@@ -53,11 +54,13 @@ namespace Deribit.Net.ConsoleApp
             //var t = message.
             if (message.Header.GetField(Tags.MsgType) == MsgType.LOGON)
             {
-                message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
-                var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
-                message.SetField(new QuickFix.Fields.RawData(rawdata));
-                var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
-                message.SetField(new QuickFix.Fields.Password(pass));
+                //message.SetField(new QuickFix.Fields.Username("QTaUk5S9uMrt"));
+                //var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
+                //message.SetField(new QuickFix.Fields.RawData(rawdata));
+                //var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
+                message.SetField(new QuickFix.Fields.Password("Sandbox1234"));
+                message.SetField(new QuickFix.Fields.ResetSeqNumFlag(true));
+
             }
         }
 
@@ -340,7 +343,8 @@ namespace Deribit.Net.ConsoleApp
 
         private QuickFix.FIX44.MarketDataRequest QueryMarketDataRequest44()
         {
-            MDReqID mdReqID = new MDReqID("BTC-PERPETUAL");
+
+            MDReqID mdReqID = new MDReqID();
             SubscriptionRequestType subType = new SubscriptionRequestType(SubscriptionRequestType.SNAPSHOT);
             MarketDepth marketDepth = new MarketDepth(0);
 
@@ -356,6 +360,7 @@ namespace Deribit.Net.ConsoleApp
 
             return message;
         }
+      
         #endregion
 
         #region field query private methods
