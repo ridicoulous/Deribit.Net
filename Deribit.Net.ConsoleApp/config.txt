@@ -10,21 +10,9 @@ SocketConnectHost=3.80.8.7
 DataDictionary=FIX44.xml
 StartTime=00:00:00
 EndTime=23:59:59
-Password=Sandbox1234
+Password=Testing123!
 
 [SESSION]
 BeginString=FIX.4.4
 SenderCompID=DCLIENT5
 ConnectionType=initiator
-
-
-# • 3.80.8.7
-#FIX Session details:
-#Market Data FIX Gateway
-#Port: 7005
-#SenderCompId: DCLIENT5
-#TargetCompId: SHIFTFX
-#Order Entry FIX Gateway
-#Port: 9005
-#SenderCompId: TCLIENT5
-#TargetCompId: SHIFTFX

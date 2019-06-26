@@ -38,7 +38,7 @@ namespace Deribit.Net.ConsoleApp
                 //var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
                 //message.SetField(new QuickFix.Fields.RawData(rawdata));
                 //var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
-                message.SetField(new QuickFix.Fields.Password("Sandbox1234"));
+                message.SetField(new QuickFix.Fields.Password("Testing123!"));
                 message.SetField(new QuickFix.Fields.ResetSeqNumFlag(true));
             }
         }
@@ -58,7 +58,7 @@ namespace Deribit.Net.ConsoleApp
                 //var rawdata = $"{(long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds}.{GetBase64(GetRandomBytes())}";
                 //message.SetField(new QuickFix.Fields.RawData(rawdata));
                 //var pass = GetBase64(GetSha256Hash(rawdata + "YHL42CUPBYLRAGUM54YRX4X3OQJI3BKT"));
-                message.SetField(new QuickFix.Fields.Password("Sandbox1234"));
+                message.SetField(new QuickFix.Fields.Password("Testing123!"));
                 message.SetField(new QuickFix.Fields.ResetSeqNumFlag(true));
 
             }
@@ -149,6 +149,10 @@ namespace Deribit.Net.ConsoleApp
             if (m != null)
                 SendMessage(m);
         }
+        public void Logon()
+        {
+           
+        }
         public void Run()
         {
             //QuerySecurityListRequest();
@@ -165,6 +169,7 @@ namespace Deribit.Net.ConsoleApp
                         QueryReplaceOrder();
                     else if (action == '4')
                         QueryMarketDataRequest();
+             
                     else if (action == 'g')
                     {
                         if (this.MyInitiator.IsStopped)
@@ -201,7 +206,7 @@ namespace Deribit.Net.ConsoleApp
         {
             if (_session != null)
             {
-                Console.WriteLine($"Sending message # "+ m.GetField(Tags.MsgSeqNum));
+                Console.WriteLine($"Sending message "+m.ToString());
                 _session.Send(m);
 
             }
@@ -343,22 +348,34 @@ namespace Deribit.Net.ConsoleApp
 
         private QuickFix.FIX44.MarketDataRequest QueryMarketDataRequest44()
         {
+            //MDReqID mdReqID = new MDReqID();
+            //SubscriptionRequestType subType = new SubscriptionRequestType(SubscriptionRequestType.SNAPSHOT);
+            //MarketDepth marketDepth = new MarketDepth(0);
 
-            MDReqID mdReqID = new MDReqID();
-            SubscriptionRequestType subType = new SubscriptionRequestType(SubscriptionRequestType.SNAPSHOT);
-            MarketDepth marketDepth = new MarketDepth(0);
+            //QuickFix.FIX44.MarketDataRequest.NoMDEntryTypesGroup marketDataEntryGroup = new QuickFix.FIX44.MarketDataRequest.NoMDEntryTypesGroup();
+            //marketDataEntryGroup.Set(new MDEntryType(MDEntryType.BID));
 
-            QuickFix.FIX44.MarketDataRequest.NoMDEntryTypesGroup marketDataEntryGroup = new QuickFix.FIX44.MarketDataRequest.NoMDEntryTypesGroup();
-            marketDataEntryGroup.Set(new MDEntryType(MDEntryType.BID));
+            //QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup symbolGroup = new QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup();
+            //symbolGroup.Set(new Symbol("BTC-PERPETUAL"));
 
+            //QuickFix.FIX44.MarketDataRequest message = new QuickFix.FIX44.MarketDataRequest(mdReqID, subType, marketDepth);
+           // message.AddGroup(marketDataEntryGroup);
+           // message.AddGroup(symbolGroup);
+
+            QuickFix.FIX44.MarketDataRequest message2 = new QuickFix.FIX44.MarketDataRequest();
+            message2.NoRelatedSym = new NoRelatedSym(1);
             QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup symbolGroup = new QuickFix.FIX44.MarketDataRequest.NoRelatedSymGroup();
-            symbolGroup.Set(new Symbol("BTC-PERPETUAL"));
-
-            QuickFix.FIX44.MarketDataRequest message = new QuickFix.FIX44.MarketDataRequest(mdReqID, subType, marketDepth);
-            message.AddGroup(marketDataEntryGroup);
-            message.AddGroup(symbolGroup);
-
-            return message;
+            symbolGroup.Set(new Symbol("BTCUSD"));
+            message2.AddGroup(symbolGroup);
+            message2.MDReqID = new MDReqID(Guid.NewGuid().ToString());
+            message2.SubscriptionRequestType = new SubscriptionRequestType('1');
+            message2.MarketDepth = new MarketDepth(0);
+            message2.MDUpdateType = new MDUpdateType(0);
+            message2.NoMDEntryTypes = new NoMDEntryTypes(3);
+            message2.SetField(new MDEntryType('0'));
+            message2.SetField(new MDEntryType('1'));
+            message2.SetField(new MDEntryType('2'));
+            return message2;
         }
       
         #endregion

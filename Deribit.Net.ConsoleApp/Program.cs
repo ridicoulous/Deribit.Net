@@ -38,7 +38,7 @@ namespace Deribit.Net.ConsoleApp
             application.MyInitiator = initiator;
             
             initiator.Start();
-            //application.QuerySecurityListRequest();
+            application.QuerySecurityListRequest();
             application.Run();
             initiator.Stop();
 
